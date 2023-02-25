@@ -1,7 +1,6 @@
 import shutil
 
-
-class Banner:
+class Colors:
     black   = '\033[30m'
     red     = '\033[31m'
     green   = '\033[32m'
@@ -11,6 +10,27 @@ class Banner:
     cyan    = '\033[36m'
     white   = '\033[37m'
     reset   = '\033[0m'
+
+
+    @staticmethod
+    def get_color(func_name):
+        if func_name == 'success':
+            return Colors.green
+        elif func_name == 'error':
+            return Colors.red
+        elif func_name == 'info':
+            return Colors.yellow
+        else:
+            return Colors.white
+
+
+
+
+class Banner:
+    '''Simple, colored terminal banners to point out the events of your processes.'''
+
+
+    _registered_methods = {}
 
     def __init__(self, style:str='-'):
         self.style = style
@@ -27,25 +47,30 @@ class Banner:
         def wrapper(self, message=None):
             if message is None:
                 message = func.__defaults__[0]
-            color = Banner.get_color(func.__name__)
+            color = Colors.get_color(func.__name__)
             lines, msg = self._fill_term(message=message)
-            formatted_lines = f'{color}{lines}{Banner.reset}'
-            formatted_msg = f'{color}{msg}{Banner.reset}'
+            formatted_lines = f'{color}{lines}{Colors.reset}'
+            formatted_msg = f'{color}{msg}{Colors.reset}'
             print(f'{formatted_lines}\n{formatted_msg}\n{formatted_lines}')
         return wrapper
     
-    @staticmethod
-    def get_color(func_name):
-        if func_name == 'success':
-            return Banner.green
-        elif func_name == 'error':
-            return Banner.red
-        elif func_name == 'info':
-            return Banner.yellow
-        else:
-            return Banner.white
 
+    def register(self, func_name, color, message):
+        Banner._registered_methods[func_name] = {
+            'color': color,
+            'message': message
+        }
 
+        def registered_func(self, message=None):
+            if message is None:
+                message = message or Banner._registered_methods[func_name]['message']
+            color = Colors.get_color(func_name=func_name)
+            lines, msg = self._fill_term(message=message)
+            formatted_lines = f'{color}{lines}{Colors.reset}'
+            formatted_msg = f'{color}{msg}{Colors.reset}'
+            print(f'{formatted_lines}\n{formatted_msg}\n{formatted_lines}')
+        setattr(Banner, func_name, Banner._format(registered_func))
+    
 
     @_format
     def success(self, message='SUCCESS'):
