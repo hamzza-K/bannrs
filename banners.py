@@ -14,6 +14,8 @@ class Colors:
 
     @staticmethod
     def get_color(func_name):
+        if func_name in Banner._registered_methods:
+            return Banner._registered_methods[func_name]['color']
         if func_name == 'success':
             return Colors.green
         elif func_name == 'error':
@@ -28,8 +30,6 @@ class Colors:
 
 class Banner:
     '''Simple, colored terminal banners to point out the events of your processes.'''
-
-
     _registered_methods = {}
 
     def __init__(self, style:str='-'):
@@ -44,7 +44,7 @@ class Banner:
         return lines, formatted_msg
 
     def _format(func):
-        def wrapper(self, message=None):
+        def wrapper(self, message: str=None):
             if message is None:
                 message = func.__defaults__[0]
             color = Colors.get_color(func.__name__)
@@ -55,7 +55,9 @@ class Banner:
         return wrapper
     
 
-    def register(self, func_name, color, message):
+    def register(self, func_name: str, color: str, message: str):
+        if not hasattr(Colors, color): color = Colors.white
+        print('the color is', getattr(Colors, color) + 'abc' + Colors.reset)
         Banner._registered_methods[func_name] = {
             'color': color,
             'message': message
@@ -64,7 +66,7 @@ class Banner:
         def registered_func(self, message=None):
             if message is None:
                 message = message or Banner._registered_methods[func_name]['message']
-            color = Colors.get_color(func_name=func_name)
+            color = getattr(Colors, (Colors.get_color(func_name=func_name)))
             lines, msg = self._fill_term(message=message)
             formatted_lines = f'{color}{lines}{Colors.reset}'
             formatted_msg = f'{color}{msg}{Colors.reset}'
@@ -85,5 +87,10 @@ class Banner:
         return message
         
 
+if __name__ == '__main__':
+    ban = Banner()
+    ban.register('abc', 'cyan', 'def')
+    ban.abc('adssadsa')
+    print('registered methods:', ban._registered_methods)
 
          
