@@ -1,1 +1,1 @@
-Small Light-weight python snippets
+Colored terminal banners for information.
