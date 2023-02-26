@@ -1,3 +1,4 @@
+from typing import Tuple
 import shutil
 
 class Colors:
@@ -35,7 +36,7 @@ class Banner:
     def __init__(self, style:str='-'):
         self.style = style
 
-    def _fill_term(self, message:str) -> str:
+    def _fill_term(self, message:str) -> Tuple[str,str]:
         term_size = shutil.get_terminal_size((80, 20)).columns
         style_count = (term_size - len(message))
         formatted_msg = message.center(style_count, ' ')
@@ -86,11 +87,3 @@ class Banner:
     def info(self, message='INFO'):
         return message
         
-
-if __name__ == '__main__':
-    ban = Banner()
-    ban.register('abc', 'cyan', 'def')
-    ban.abc('adssadsa')
-    print('registered methods:', ban._registered_methods)
-
-         
