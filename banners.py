@@ -44,6 +44,7 @@ class Banner:
 
         return lines, formatted_msg
 
+    @staticmethod
     def _format(func):
         def wrapper(self, message: str=None):
             if message is None:
